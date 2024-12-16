@@ -31,11 +31,18 @@ class PasswordManager:
                 self.password_dict[site] = Fernet(self.key).decrypt(encrypted.encode()).decode()
 
     def add_password(self, site, password):
+        if site in self.password_dict:
+            update=input(f'password for {site} already exist . do you want to update it (y/n)?').strip().lower()
+            if update == 'n':
+                print(f'password for {site} will not be updated')
+                return
         self.password_dict[site] = password
         if self.password_file is not None:
             with open(self.password_file, 'a+') as f:
                 encrypted = Fernet(self.key).encrypt(password.encode()).decode()
                 f.write(f"{site}:{encrypted}\n")
+        if update == 'y':
+            print('password have been updated')
 
     def get_password(self, site):
         return self.password_dict.get(site, "Password not found.")
